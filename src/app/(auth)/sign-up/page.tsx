@@ -3,44 +3,43 @@ import MaxWidthWrapper from "@/components/MaxWidthWrapper";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Authentication, AUTHENTICATION } from "@/interface";
+import { AuthenticationSignUp, AUTHENTICATIONSIGNUP } from "@/interface";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { signIn } from "next-auth/react";
 import { Toaster, toast } from "sonner";
 import Link from "next/link";
-// red and white and black theme
-const SignIn = () => {
+
+import { useRouter } from "next/router";
+
+const SignUp = () => {
   const {
     register,
     handleSubmit,
     setValue,
     formState: { errors },
-  } = useForm<AUTHENTICATION>({
-    resolver: zodResolver(Authentication),
+  } = useForm<AUTHENTICATIONSIGNUP>({
+    resolver: zodResolver(AuthenticationSignUp),
   });
 
-  const onSubmit = async (data: AUTHENTICATION) => {
+  //   const router = useRouter();
+
+  const onSubmit = async (data: AUTHENTICATIONSIGNUP) => {
     try {
-      console.log(data);
-      const res = await signIn("credentials", {
-        email: data.email,
-        password: data.password,
-        redirect: false,
+      const res = await fetch("/api/auth/register", {
+        method: "POST",
+        body: JSON.stringify({
+          email: data.email,
+          password: data.password,
+        }),
       });
-      if (!res?.ok) {
-        return toast.error("Invalid email or password");
+      const json = await res.json();
+      if (json.user) {
+        toast.success("Signed up successfully");
+        // router.push("/sign-in");
+      } else {
+        toast.error("Error in signing up");
       }
-      return toast.success("Signed in successfully");
-      // const res = await fetch("/api/auth/register", {
-      //   method: "POST",
-      //   body: JSON.stringify({
-      //     email: data.email,
-      //     password: data.password,
-      //   }),
-      // });
-      // const json = await res.json();
-      // console.log(json);
     } catch (e) {
       console.error(e);
     }
@@ -57,6 +56,20 @@ const SignIn = () => {
             <span className="text-2xl font-bold text-primary">Platform</span>
           </h1>
           <form onSubmit={handleSubmit(onSubmit)} className="grid space-y-4">
+            <div className="">
+              <Label htmlFor="email">Username</Label>
+              <Input
+                type="text"
+                id="username"
+                placeholder="Your username"
+                {...register("username")}
+              />
+              {errors.email && (
+                <p className="text-red-500 text-sm">
+                  {errors.username?.message}
+                </p>
+              )}
+            </div>
             <div className="">
               <Label htmlFor="email">Email</Label>
               <Input
@@ -83,11 +96,11 @@ const SignIn = () => {
                 </p>
               )}
             </div>
-            <Link href="/sign-up" className="text-sm text-end">
-              <span>Don&apos;t have an account? Sign Up</span>
+            <Link href="/sign-in" className="text-sm text-end">
+              <span>Already have an account? Sign In</span>
             </Link>
             <Button type="submit" className="w-full">
-              Sign In
+              Sign Up
             </Button>
           </form>
         </div>
@@ -96,4 +109,4 @@ const SignIn = () => {
   );
 };
 
-export default SignIn;
+export default SignUp;
