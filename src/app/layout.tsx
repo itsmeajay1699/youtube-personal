@@ -4,6 +4,8 @@ import "./globals.css";
 import { getServerSession } from "next-auth";
 import LogoutButton from "@/components/LogoutButton";
 import Link from "next/link";
+import ToasterComponent from "@/components/Toaster";
+import Navbar from "@/components/Navbar";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -21,16 +23,11 @@ export default async function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
-        <nav>
-          {session ? (
-            <LogoutButton />
-          ) : (
-            <>
-              <Link href="/sign-in">Sign In</Link>
-            </>
-          )}
-        </nav>
-        <main className="min-h-screen">{children}</main>
+        <ToasterComponent />
+        <main className="min-h-screen">
+          <Navbar />
+          <div className="">{children}</div>
+        </main>
       </body>
     </html>
   );

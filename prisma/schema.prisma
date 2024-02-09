@@ -13,3 +13,15 @@ model User {
   username     String?
   password String
 }
+
+model Post {
+  id        String  @id @default(uuid())
+  title     String
+}
+
+model Profile {
+  id        String  @id @default(uuid())
+  bio       String?
+  
+  userId    String
+}
